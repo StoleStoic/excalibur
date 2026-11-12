@@ -1,0 +1,73 @@
+# Security depends on shipping Chromium updates quickly. Every day this looks
+# for a new ungoogled-chromium-windows release, moves the submodule to it,
+# checks that our patches still apply, and opens a pull request.
+#
+# Requires: Settings > Actions > General > "Allow GitHub Actions to create and
+# approve pull requests".
+name: upstream-update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 5 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Move submodule to the latest upstream release
+        id: bump
+        run: |
+          cd upstream/ungoogled-chromium-windows
+          git fetch --quiet --tags origin
+          latest=$(git tag --sort=-creatordate | head -n 1)
+          git checkout --quiet "$latest"
+          git submodule update --init --recursive
+          cd "$GITHUB_WORKSPACE"
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "tag=$latest" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check patches against the new version
+        id: check
+        if: steps.bump.outputs.changed == 'true'
+        continue-on-error: true
+        run: python3 devutils/check_patches.py 2>&1 | tee check.log
+      - name: Open pull request
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.bump.outputs.tag }}
+          CHECK: ${{ steps.check.outcome }}
+        run: |
+          branch="upstream/$TAG"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "Pull request branch for $TAG already exists."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git commit --quiet -m "Update upstream to $TAG" upstream/ungoogled-chromium-windows
+          git push --quiet origin "$branch"
+          {
+            echo "Updates ungoogled-chromium-windows to \`$TAG\`."
+            echo
+            echo "Patch check: **$CHECK**"
+            echo
+            echo '```'
+            cat check.log
+            echo '```'
+            echo
+            echo "After merging, push a version tag to build and publish a release."
+          } > body.md
+          gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
+            --title "Update upstream to $TAG" --body-file body.md

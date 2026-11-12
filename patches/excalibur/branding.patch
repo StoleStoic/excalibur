@@ -1,0 +1,23 @@
+# Product and company names used for the executable's version information
+# and the installer.
+
+--- a/chrome/app/theme/chromium/BRANDING
++++ b/chrome/app/theme/chromium/BRANDING
+@@ -1,10 +1,10 @@
+-COMPANY_FULLNAME=The Chromium Authors
+-COMPANY_SHORTNAME=The Chromium Authors
+-PRODUCT_FULLNAME=Chromium
+-PRODUCT_SHORTNAME=Chromium
+-PRODUCT_INSTALLER_FULLNAME=Chromium Installer
+-PRODUCT_INSTALLER_SHORTNAME=Chromium Installer
+-COPYRIGHT=Copyright @LASTCHANGE_YEAR@ The Chromium Authors. All rights reserved.
++COMPANY_FULLNAME=The Excalibur Authors
++COMPANY_SHORTNAME=The Excalibur Authors
++PRODUCT_FULLNAME=Excalibur
++PRODUCT_SHORTNAME=Excalibur
++PRODUCT_INSTALLER_FULLNAME=Excalibur Installer
++PRODUCT_INSTALLER_SHORTNAME=Excalibur Installer
++COPYRIGHT=Copyright @LASTCHANGE_YEAR@ The Excalibur Authors and The Chromium Authors. All rights reserved.
+ MAC_BUNDLE_ID=org.chromium.Chromium
+ MAC_CREATOR_CODE=Cr24
+ MAC_TEAM_ID=

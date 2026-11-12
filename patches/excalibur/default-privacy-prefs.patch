@@ -1,0 +1,26 @@
+# Excalibur's privacy defaults on top of ungoogled-chromium's:
+#  * send Do Not Track
+#  * always use secure connections (HTTPS-Only Mode)
+# Both remain ordinary user settings under chrome://settings/security and
+# chrome://settings/cookies.
+
+--- a/chrome/browser/ui/browser_ui_prefs.cc
++++ b/chrome/browser/ui/browser_ui_prefs.cc
+@@ -151,7 +151,7 @@
+   registry->RegisterDictionaryPref(prefs::kBrowserWindowPlacementPopup);
+   registry->RegisterDictionaryPref(prefs::kAppWindowPlacement);
+   registry->RegisterBooleanPref(
+-      prefs::kEnableDoNotTrack, false,
++      prefs::kEnableDoNotTrack, true,
+       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+ #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+   registry->RegisterBooleanPref(prefs::kPrintPreviewUseSystemDefaultPrinter,
+@@ -225,7 +225,7 @@
+ #endif
+ 
+   registry->RegisterBooleanPref(
+-      prefs::kHttpsOnlyModeEnabled, false,
++      prefs::kHttpsOnlyModeEnabled, true,
+       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+   registry->RegisterBooleanPref(
+       prefs::kHttpsFirstBalancedMode, false,

@@ -1,0 +1,57 @@
+# Give Excalibur its own identity on Windows so it installs side by side with
+# Chromium or ungoogled-chromium instead of sharing their install directory,
+# profile (%LOCALAPPDATA%\Excalibur\User Data), registry keys, file
+# associations and notification activator.
+#
+# Not changed yet: the elevation service and tracing service CLSIDs/IIDs, which
+# must be changed together with their IDL files. They only matter for
+# system-level installs alongside a system-level Chromium.
+
+--- a/chrome/install_static/chromium_install_modes.h
++++ b/chrome/install_static/chromium_install_modes.h
+@@ -21,7 +21,7 @@
+ 
+ // The brand-specific product name to be included as a component of the install
+ // and user data directory paths.
+-inline constexpr wchar_t kProductPathName[] = L"Chromium";
++inline constexpr wchar_t kProductPathName[] = L"Excalibur";
+ 
+ // The brand-specific safe browsing client name.
+ inline constexpr char kSafeBrowsingName[] = "chromium";
+@@ -54,23 +54,23 @@
+         .logo_suffix = L"",  // No logo suffix for the primary install mode.
+         .app_guid =
+             L"",  // Empty app_guid since no integration with Google Update.
+-        .base_app_name = L"Chromium",              // A distinct base_app_name.
+-        .base_app_id = L"Chromium",                // A distinct base_app_id.
+-        .browser_prog_id_prefix = L"ChromiumHTM",  // Browser ProgID prefix.
++        .base_app_name = L"Excalibur",            // A distinct base_app_name.
++        .base_app_id = L"Excalibur",              // A distinct base_app_id.
++        .browser_prog_id_prefix = L"ExcalibHTM",  // Browser ProgID prefix.
+         .browser_prog_id_description =
+-            L"Chromium HTML Document",  // Browser ProgID description.
+-        .direct_launch_url_scheme = "chromium",
+-        .pdf_prog_id_prefix = L"ChromiumPDF",  // PDF ProgID prefix.
++            L"Excalibur HTML Document",  // Browser ProgID description.
++        .direct_launch_url_scheme = "excalibur",
++        .pdf_prog_id_prefix = L"ExcalibPDF",  // PDF ProgID prefix.
+         .pdf_prog_id_description =
+-            L"Chromium PDF Document",  // PDF ProgID description.
++            L"Excalibur PDF Document",  // PDF ProgID description.
+         .active_setup_guid =
+-            L"{7D2B3E1D-D096-4594-9D8F-A6667F12E0AC}",  // Active Setup
++            L"{34C3270B-8685-49F3-8DBA-8A2B105EA7D1}",  // Active Setup
+                                                         // GUID.
+-        .toast_activator_clsid = {0x635EFA6F,
+-                                  0x08D6,
+-                                  0x4EC9,
+-                                  {0xBD, 0x14, 0x8A, 0x0F, 0xDE, 0x97, 0x51,
+-                                   0x59}},  // Toast Activator CLSID.
++        .toast_activator_clsid = {0x92BA010F,
++                                  0x51BE,
++                                  0x4C5E,
++                                  {0x86, 0xA9, 0x71, 0xF0, 0x4A, 0x58, 0x08,
++                                   0xE2}},  // Toast Activator CLSID.
+         .elevator_clsid = {0xD133B120,
+                            0x6DB4,
+                            0x4D6B,

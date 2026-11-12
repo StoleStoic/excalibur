@@ -1,0 +1,15 @@
+# Excalibur GN build flags.
+#
+# One `name=value` per line. build.py merges this file over the upstream flags:
+# a flag upstream already sets is replaced, anything else is appended.
+#
+# Upstream (upstream/ungoogled-chromium-windows/ungoogled-chromium/flags.gn and
+# flags.windows.gn) already sets the privacy-relevant flags, including:
+#   safe_browsing_mode=0, enable_reporting=false, enable_mdns=false,
+#   enable_remoting=false, enable_service_discovery=false,
+#   enable_hangout_services_extension=false, google_api_key="",
+#   use_official_google_api_keys=false, disable_fieldtrial_testing_config=true
+#
+# Only add a flag here after confirming it exists in the pinned Chromium
+# version: the build runs `gn gen --fail-on-unused-args`, so an unknown flag
+# fails the build.

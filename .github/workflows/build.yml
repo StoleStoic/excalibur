@@ -1,0 +1,143 @@
+# Builds the Windows x64 installer and zip.
+# Runs on version tags and on demand (Actions tab > build > Run workflow).
+name: build
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-1:
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: 'false'
+      from_artifact: false
+  build-2:
+    needs: build-1
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-1.outputs.finished }}
+      from_artifact: true
+  build-3:
+    needs: build-2
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-2.outputs.finished }}
+      from_artifact: true
+  build-4:
+    needs: build-3
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-3.outputs.finished }}
+      from_artifact: true
+  build-5:
+    needs: build-4
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-4.outputs.finished }}
+      from_artifact: true
+  build-6:
+    needs: build-5
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-5.outputs.finished }}
+      from_artifact: true
+  build-7:
+    needs: build-6
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-6.outputs.finished }}
+      from_artifact: true
+  build-8:
+    needs: build-7
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-7.outputs.finished }}
+      from_artifact: true
+  build-9:
+    needs: build-8
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-8.outputs.finished }}
+      from_artifact: true
+  build-10:
+    needs: build-9
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-9.outputs.finished }}
+      from_artifact: true
+  build-11:
+    needs: build-10
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-10.outputs.finished }}
+      from_artifact: true
+  build-12:
+    needs: build-11
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-11.outputs.finished }}
+      from_artifact: true
+  build-13:
+    needs: build-12
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-12.outputs.finished }}
+      from_artifact: true
+  build-14:
+    needs: build-13
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-13.outputs.finished }}
+      from_artifact: true
+  build-15:
+    needs: build-14
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-14.outputs.finished }}
+      from_artifact: true
+  build-16:
+    needs: build-15
+    uses: ./.github/workflows/_stage.yml
+    with:
+      finished: ${{ needs.build-15.outputs.finished }}
+      from_artifact: true
+  package:
+    needs: build-16
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Ensure build finished
+        run: |
+          if [ "${{ needs.build-16.outputs.finished }}" != "true" ]; then
+            echo "Build did not finish after 16 stages."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: chromium
+          path: upstream-packages
+      - name: Rename packages
+        run: |
+          python3 build.py --collect upstream-packages
+          cd dist && sha256sum * > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: excalibur-windows-x64
+          path: dist/
+          compression-level: 0
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Excalibur $GITHUB_REF_NAME" --generate-notes

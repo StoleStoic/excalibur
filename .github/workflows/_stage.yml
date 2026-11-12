@@ -1,0 +1,42 @@
+# One resumable slice of the Windows build. A full Chromium build takes far
+# longer than a single GitHub-hosted job may run, so build.yml chains several
+# of these; each one resumes from the previous one's uploaded build tree.
+#
+# The workspace root is turned into the merged upstream + Excalibur tree so
+# that upstream's own CI actions (which track upstream's toolchain needs) can
+# be reused unchanged.
+name: stage
+on:
+  workflow_call:
+    inputs:
+      finished:
+        type: string
+        required: true
+      from_artifact:
+        type: boolean
+        required: true
+    outputs:
+      finished:
+        value: ${{ jobs.stage.outputs.finished }}
+
+jobs:
+  stage:
+    runs-on: windows-2022
+    outputs:
+      finished: ${{ steps.stage.outputs.finished }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          path: excalibur
+      - name: Stage merged build tree
+        shell: pwsh
+        run: python excalibur/build.py --stage-only --stage-dir .
+      - name: Prepare
+        uses: ./.github/actions/prepare
+      - name: Run stage
+        id: stage
+        uses: ./.github/actions/stage
+        with:
+          finished: ${{ inputs.finished }}
+          from_artifact: ${{ inputs.from_artifact }}

@@ -1,0 +1,4 @@
+# Excalibur patches, applied in order after all upstream patches.
+excalibur/branding.patch
+excalibur/install-identity.patch
+excalibur/default-privacy-prefs.patch

@@ -1,0 +1,20 @@
+# Fast checks (seconds, no Chromium checkout): our patches still apply to the
+# pinned Chromium version and the merged build tree can be staged.
+name: check
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - run: python3 devutils/check_patches.py
+      - run: python3 build.py --stage-only
