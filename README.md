@@ -11,10 +11,11 @@ patches in this repository, so every change Excalibur makes is reviewable.
 
 ## Status
 
-Early scaffold. The patches apply cleanly to the pinned Chromium version
-(checked by `devutils/check_patches.py`), but **no full build has been compiled
-yet**. The first build on a Windows machine or on GitHub Actions is the next
-step; expect to fix things there.
+Early. The project compiles and packages on GitHub Actions: the first full
+build (Chromium 158.0.8127.36) produced an installer and a portable zip that
+carry the Excalibur name and identity. That installer has not yet been
+installed and exercised on a real Windows machine, and there is no signed
+release.
 
 ## What you get
 
@@ -97,7 +98,7 @@ bug.
 
 In rough priority order:
 
-1. **First compiled build**, then fix whatever the compiler finds.
+1. **Install and smoke-test the first build** on Windows; publish a first release.
 2. **Automatic updates.** Upstream has no updater. Until Excalibur has one,
    users must install each new version by hand, which is not acceptable for
    non-technical users.
