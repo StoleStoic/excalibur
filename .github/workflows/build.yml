@@ -3,12 +3,21 @@
 name: build
 on:
   workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: >-
+          Optional: ID of an earlier build run to resume from (its saved build
+          tree is reused and ci/resume-hotfix.patch is applied to it).
+        type: string
+        required: false
+        default: ''
   push:
     tags:
       - '*'
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: build-${{ github.ref }}
@@ -20,6 +29,7 @@ jobs:
     with:
       finished: 'false'
       from_artifact: false
+      resume_run_id: ${{ inputs.resume_run_id }}
   build-2:
     needs: build-1
     uses: ./.github/workflows/_stage.yml

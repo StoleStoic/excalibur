@@ -15,6 +15,13 @@ on:
       from_artifact:
         type: boolean
         required: true
+      resume_run_id:
+        description: >-
+          Resume from the saved build tree of an earlier run instead of starting
+          from nothing, applying ci/resume-hotfix.patch to it if that file exists.
+        type: string
+        required: false
+        default: ''
     outputs:
       finished:
         value: ${{ jobs.stage.outputs.finished }}
@@ -34,6 +41,27 @@ jobs:
         run: python excalibur/build.py --stage-only --stage-dir .
       - name: Prepare
         uses: ./.github/actions/prepare
+      - name: Download build tree from run ${{ inputs.resume_run_id }}
+        if: inputs.resume_run_id != ''
+        uses: actions/download-artifact@v8
+        with:
+          name: build-artifact
+          run-id: ${{ inputs.resume_run_id }}
+          github-token: ${{ github.token }}
+          path: C:\ungoogled-chromium-windows\build
+      - name: Unpack build tree and apply hotfix
+        if: inputs.resume_run_id != ''
+        shell: pwsh
+        run: |
+          $build = 'C:\ungoogled-chromium-windows\build'
+          7z x "$build\artifacts.zip" "-o$build" -y | Select-Object -Last 5
+          if ($LASTEXITCODE -ne 0) { throw "7z failed with code $LASTEXITCODE" }
+          Remove-Item "$build\artifacts.zip"
+          $hotfix = 'excalibur\ci\resume-hotfix.patch'
+          if (Test-Path $hotfix) {
+            & 'C:\Program Files\Git\usr\bin\patch.exe' -p1 --forward --no-backup-if-mismatch -d "$build\src" -i (Resolve-Path $hotfix).Path
+            if ($LASTEXITCODE -ne 0) { throw "hotfix did not apply (code $LASTEXITCODE)" }
+          }
       - name: Run stage
         id: stage
         uses: ./.github/actions/stage
